@@ -1,1 +1,1 @@
-Command to display current working directory
+contents list of your current directory
