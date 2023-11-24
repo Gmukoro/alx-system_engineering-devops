@@ -4,13 +4,13 @@
 
 counter=1
 
-until [ $counter -gt 10 ];
+until [ $counter -gt 10 ]
 
 do
 
-    echo "Best School"
+	echo "Best School"
     
-    ((counter++))
+	((counter++))
 
 done
 
