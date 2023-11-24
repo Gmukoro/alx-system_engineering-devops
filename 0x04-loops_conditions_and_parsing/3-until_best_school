@@ -2,16 +2,15 @@
 
 # Bash script to display "Best School" 10 times using an until loop
 
-# Initialize counter
 counter=1
 
-# Use an until loop to iterate until counter reaches 10
 until [ $counter -gt 10 ];
+
 do
 
     echo "Best School"
     
-    # Increment the counter
     ((counter++))
+
 done
 
