@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
+# A bash while loop to repeatedly print the string "Best School" 10 times
 
-# A bash script to display "Best School" 10 times using a while loop
-
-# Initialize counter
 counter=1
 
-# Use a while loop to iterate until counter reaches 10
-while [ $counter -le 10 ]; do
-    echo "Best School"
-    
-    # Increment the counter
-    ((counter++))
+while [ $counter -le 10 ]
+
+do
+
+  echo "Best School"
+
+  ((counter++))
+
 done
