@@ -15,17 +15,17 @@ echo -e "${blue}Updating and performing minor checks...${reset}\n"
 
 # Function to install required packages
 function install() {
-	command -v "$1" &> /dev/null
+    command -v "$1" &> /dev/null
 
-	# Check if the command exists
-	if [ $? -ne 0 ]; then
-		echo -e "	Installing: ${brown}$1${reset}\n"
-		sudo apt-get update -y -qq && \
-			sudo apt-get install -y "$1" -qq
-		echo -e "\n"
-	else
-		echo -e "	${green}${1} is already installed.${reset}\n"
-	fi
+    # Check if the command exists
+    if [ $? -ne 0 ]; then
+        echo -e "       Installing: ${brown}$1${reset}\n"
+        sudo apt-get update -y -qq && \
+        sudo apt-get install -y "$1" -qq
+        echo -e "\n"
+    else
+        echo -e "       ${green}${1} is already installed.${reset}\n"
+    fi
 }
 
 # Install Nginx
@@ -39,19 +39,19 @@ sudo ufw allow 'Nginx HTTP'
 
 # Give ownership of website files to the user for easy editing
 if [ -d "/var/www" ]; then
-	sudo chown -R "$USER":"$USER" /var/www
-	sudo chmod -R 755 /var/www
+    sudo chown -R "$USER":"$USER" /var/www
+    sudo chmod -R 755 /var/www
 else
-	sudo mkdir -p /var/www
-	sudo chown -R "$USER":"$USER" /var/www
-	sudo chmod -R 755 /var/www
+    sudo mkdir -p /var/www
+    sudo chown -R "$USER":"$USER" /var/www
+    sudo chmod -R 755 /var/www
 fi
 
 # Create directories if not present
 for dir in /var/www/{html,error}; do
-	if ! [ -d "$dir" ]; then
-		mkdir -p "$dir"
-	fi
+    if ! [ -d "$dir" ]; then
+        mkdir -p "$dir"
+    fi
 done
 
 # Create a new index file
@@ -64,33 +64,32 @@ echo "Ceci n'est pas une page" > /var/www/html/error_404.html
 sudo cp /etc/nginx/sites-enabled/default nginx-sites-enabled_default.backup
 
 # Configure Nginx server with custom HTTP response header
-server_config=\
-"server {
-		listen 80 default_server;
-		listen [::]:80 default_server;
-		root /var/www/html;
-		index index.html index.htm index.nginx-debian.html
-		server_name_;
-		add_header X-Served-By \$hostname;
-		location / {
-			try_files \$uri \$uri/ =404;
-		}
-		if (\$request_filename ~ redirect_me){
-			rewrite ^ https://th3-gr00t.tk/ permanent;
-		}
-		error_page 404 /error_404.html;
-		location = /error_404.html {
-			internal;
-		}
-}"
+server_config=$(cat << EOF
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    root /var/www/html;
+    index index.html index.htm index.nginx-debian.html;
+    server_name _;
+    add_header X-Served-By \$hostname;
+    location / {
+        try_files \$uri \$uri/ =404;
+    }
+    error_page 404 /error_404.html;
+    location = /error_404.html {
+        internal;
+    }
+}
+EOF
+)
 
 # Apply the server configuration to Nginx
-echo "$server_config" | sudo dd status=none of=/etc/nginx/sites-enabled/default
+echo "$server_config" | sudo tee /etc/nginx/sites-enabled/default >/dev/null
 
 # Restart Nginx service
 if [ "$(pgrep -c nginx)" -le 0 ]; then
-	sudo service nginx start
+    sudo service nginx start
 else
-	sudo service nginx restart
+    sudo service nginx restart
 fi
 
