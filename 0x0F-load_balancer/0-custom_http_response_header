@@ -1,22 +1,23 @@
 #!/usr/bin/env bash
-# duplicate web-01 to web-02
-# An upgrade from the web-server scripts...
+# Duplicate web-01 configuration to web-02
 
-# uncomment to see the script run in action
-#set -x
+# Uncomment to enable debug mode
+# set -x
 
-# colors
+# Define colors for output
 blue='\e[1;34m'
 brown='\e[0;33m'
 green='\e[1;32m'
 reset='\033[0m'
 
-echo -e "${blue}Updating and doing some minor checks...${reset}\n"
+# Display message for updating and performing minor checks
+echo -e "${blue}Updating and performing minor checks...${reset}\n"
 
+# Function to install required packages
 function install() {
 	command -v "$1" &> /dev/null
 
-	#shellcheck disable=SC2181
+	# Check if the command exists
 	if [ $? -ne 0 ]; then
 		echo -e "	Installing: ${brown}$1${reset}\n"
 		sudo apt-get update -y -qq && \
@@ -27,14 +28,16 @@ function install() {
 	fi
 }
 
-install nginx #install nginx
+# Install Nginx
+install nginx
 
-echo -e "\n${blue}Setting up some minor stuff.${reset}\n"
+# Display message for setting up minor configurations
+echo -e "\n${blue}Setting up minor configurations...${reset}\n"
 
-# allowing nginx on firewall
+# Allow Nginx through the firewall
 sudo ufw allow 'Nginx HTTP'
 
-# Give the user ownership to website files for easy editing
+# Give ownership of website files to the user for easy editing
 if [ -d "/var/www" ]; then
 	sudo chown -R "$USER":"$USER" /var/www
 	sudo chmod -R 755 /var/www
@@ -44,21 +47,23 @@ else
 	sudo chmod -R 755 /var/www
 fi
 
-# creates directories if not present
+# Create directories if not present
 for dir in /var/www/{html,error}; do
 	if ! [ -d "$dir" ]; then
 		mkdir -p "$dir"
 	fi
 done
 
-# creates new index
+# Create a new index file
 echo "Hello World!" > /var/www/html/index.html
 
+# Create a new error page
 echo "Ceci n'est pas une page" > /var/www/html/error_404.html
 
-# backup default server config file
+# Backup default server configuration file
 sudo cp /etc/nginx/sites-enabled/default nginx-sites-enabled_default.backup
 
+# Configure Nginx server with custom HTTP response header
 server_config=\
 "server {
 		listen 80 default_server;
@@ -79,11 +84,13 @@ server_config=\
 		}
 }"
 
-#shellcheck disable=SC2154
+# Apply the server configuration to Nginx
 echo "$server_config" | sudo dd status=none of=/etc/nginx/sites-enabled/default
 
+# Restart Nginx service
 if [ "$(pgrep -c nginx)" -le 0 ]; then
 	sudo service nginx start
 else
 	sudo service nginx restart
 fi
+
