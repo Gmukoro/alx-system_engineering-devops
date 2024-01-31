@@ -10,6 +10,12 @@ brown='\e[0;33m'
 green='\e[1;32m'
 reset='\033[0m'
 
+# Check if hostname is provided as an argument
+if [ -z "$1" ]; then
+    echo "Usage: $0 <hostname>"
+    exit 1
+fi
+
 # Display message for updating and performing minor checks
 echo -e "${blue}Updating and performing minor checks...${reset}\n"
 
@@ -21,7 +27,7 @@ function install() {
     if [ $? -ne 0 ]; then
         echo -e "       Installing: ${brown}$1${reset}\n"
         sudo apt-get update -y -qq && \
-        sudo apt-get install -y "$1" -qq
+            sudo apt-get install -y "$1" -qq
         echo -e "\n"
     else
         echo -e "       ${green}${1} is already installed.${reset}\n"
@@ -64,14 +70,14 @@ echo "Ceci n'est pas une page" > /var/www/html/error_404.html
 sudo cp /etc/nginx/sites-enabled/default nginx-sites-enabled_default.backup
 
 # Configure Nginx server with custom HTTP response header
-server_config=$(cat << EOF
+server_config=$(cat <<EOF
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
     root /var/www/html;
     index index.html index.htm index.nginx-debian.html;
     server_name _;
-    add_header X-Served-By $(hostname);
+    add_header X-Served-By "$1";
     location / {
         try_files \$uri \$uri/ =404;
     }
@@ -87,9 +93,5 @@ EOF
 echo "$server_config" | sudo tee /etc/nginx/sites-enabled/default >/dev/null
 
 # Restart Nginx service
-if [ "$(pgrep -c nginx)" -le 0 ]; then
-    sudo service nginx start
-else
-    sudo service nginx restart
-fi
+sudo systemctl restart nginx
 
