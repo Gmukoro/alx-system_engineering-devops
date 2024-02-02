@@ -1,37 +1,31 @@
 #!/usr/bin/env bash
 
-# Function to print information about a subdomain
-print_subdomain_info() {
+# Function to display subdomain information
+display_subdomain_info() {
     local domain="$1"
     local subdomain="$2"
-    
-    # Query DNS records for the subdomain
-    local dig_output=$(dig +short "$subdomain.$domain")
-
-    # Check if there are results
-    if [ -z "$dig_output" ]; then
-        echo "No records found for $subdomain.$domain"
-    else
-        local record=$(echo "$dig_output" | awk '{ print $4 }')
-        local destination=$(echo "$dig_output" | awk '{ print $5 }')
-        echo "The subdomain $subdomain is a $record record and points to $destination"
-    fi
+    local record_type=$(dig +short "$subdomain.$domain" | awk '{print $4}')
+    local destination=$(dig +short "$subdomain.$domain" | awk '{print $1}')
+    echo "The subdomain $subdomain is a $record_type record and points to $destination"
 }
 
 # Main function
 main() {
     local domain="$1"
+    local subdomain="$2"
 
-    # Print information for default subdomains
-    print_subdomain_info "$domain" "www"
-    print_subdomain_info "$domain" "lb-01"
-    print_subdomain_info "$domain" "web-01"
-    print_subdomain_info "$domain" "web-02"
+    if [[ -z "$subdomain" ]]; then
+        subdomain="www lb-01 web-01 web-02"
+    fi
+
+    for sub in $subdomain; do
+        display_subdomain_info "$domain" "$sub"
+    done
 }
 
 # Check for required arguments
-if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 <domain>"
+if [[ $# -lt 1 ]]; then
+    echo "Usage: $0 <domain> [subdomain]"
     exit 1
 fi
 
