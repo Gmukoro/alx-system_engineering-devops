@@ -14,7 +14,7 @@ def top_ten(subreddit):
     }
     response = requests.get(
             url, headers=headers, params=params, allow_redirects=False
-    )
+            )
 
     if response.status_code != 200:
         print("None")
@@ -29,4 +29,3 @@ def top_ten(subreddit):
             print(child.get("data", {}).get("title"))
     except ValueError:
         print("None")
-
