@@ -18,14 +18,14 @@ def top_ten(subreddit):
             return
 
         try:
-            results = response.json().get("data")
-            if results is None or not results.get("children"):
+            data = response.json().get("data")
+            if not data or not data.get("children"):
                 print("None")
                 return
 
-            for child in results.get("children", []):
-                print(child.get("data", {}).get("title"))
-        except ValueError:
+            for post in data.get("children", []):
+                print(post.get("data", {}).get("title"))
+        except (ValueError, KeyError):
             print("None")
     except requests.RequestException:
         print("None")
