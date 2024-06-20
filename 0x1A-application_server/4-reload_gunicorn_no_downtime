@@ -2,9 +2,10 @@
 
 # This script gracefully reloads the Gunicorn service managed by systemd
 
-# Reload the Gunicorn service managed by systemd
+# Reload the Gunicorn service
 sudo systemctl reload gunicorn
 
+# Check the status of the reload operation
 if [ $? -eq 0 ]; then
   echo "Gunicorn gracefully reloaded"
 else
