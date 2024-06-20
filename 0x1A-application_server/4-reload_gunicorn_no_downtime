@@ -1,13 +1,13 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Get the PID of the Gunicorn master process
-GUNICORN_PID=$(ps aux | grep '[g]unicorn' | awk '{print $2}')
+# This script gracefully reloads the Gunicorn service managed by systemd
 
-# Send the HUP signal to the Gunicorn master process to reload gracefully
-if [ -n "$GUNICORN_PID" ]; then
-  kill -HUP $GUNICORN_PID
+# Reload the Gunicorn service managed by systemd
+sudo systemctl reload gunicorn
+
+if [ $? -eq 0 ]; then
   echo "Gunicorn gracefully reloaded"
 else
-  echo "Gunicorn master process not found"
+  echo "Failed to reload Gunicorn"
 fi
 
