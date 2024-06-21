@@ -2,13 +2,14 @@
 
 # This script gracefully reloads the Gunicorn service managed by systemd
 
-# Reload the Gunicorn service
+# Attempt to reload the Gunicorn service
 sudo systemctl reload gunicorn
 
-# Check the status of the reload operation
-if [ $? -eq 0 ]; then
+# Check the exit code of the systemctl command directly
+if systemctl is-active --quiet gunicorn; then
   echo "Gunicorn gracefully reloaded"
 else
+  echo "Gunicorn service is not active, cannot reload."
   echo "Failed to reload Gunicorn"
 fi
 
